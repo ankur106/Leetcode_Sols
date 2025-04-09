@@ -1,65 +1,51 @@
 public class Solution {
     public int secondMinimum(int n, int[][] edges, int time, int change) {
-        // Initialize adjacency list for the graph
+        // Build graph
         List<List<Integer>> adj = new ArrayList<>();
-        for (int i = 0; i <= n; i++) {
-            adj.add(new ArrayList<>());
-        }
-
-        // Populate adjacency list with edges
+        for (int i = 0; i <= n; i++) adj.add(new ArrayList<>());
         for (int[] edge : edges) {
-            int v1 = edge[0];
-            int v2 = edge[1];
-            adj.get(v1).add(v2);
-            adj.get(v2).add(v1);
+            adj.get(edge[0]).add(edge[1]);
+            adj.get(edge[1]).add(edge[0]);
         }
 
-        // BFS initialization
-        Queue<Integer> queue = new LinkedList<>();
-        queue.offer(1);
-        int curTime = 0;
-        int res = -1;
-        
-        // Initialize visit times for each node
+        // Queue stores [node, current time]
+        Queue<int[]> queue = new LinkedList<>();
+        queue.offer(new int[]{1, 0});
+
+        // For each node, store unique arrival times (max 2 times per node)
         List<List<Integer>> visitTimes = new ArrayList<>();
-        for (int i = 0; i <= n; i++) {
-            visitTimes.add(new ArrayList<>());
-        }
+        for (int i = 0; i <= n; i++) visitTimes.add(new ArrayList<>());
         visitTimes.get(1).add(0);
 
-        // BFS traversal
         while (!queue.isEmpty()) {
-            int levelSize = queue.size();
-            for (int i = 0; i < levelSize; i++) {
-                int node = queue.poll();
+            int[] current = queue.poll();
+            int node = current[0];
+            int curTime = current[1];
 
-                // Check if we've reached the destination node
-                if (node == n) {
-                    if (res != -1) return curTime;
-                    res = curTime;
+            for (int neighbor : adj.get(node)) {
+                int nextTime = curTime;
+
+                // Wait for green light if needed
+                if ((nextTime / change) % 2 == 1) {
+                    nextTime += change - (nextTime % change);
                 }
 
-                // Explore neighbors
-                for (int nei : adj.get(node)) {
-                    List<Integer> neiTimes = visitTimes.get(nei);
+                // Add edge traversal time
+                nextTime += time;
 
-                    // Check if the neighbor can be visited
-                    if (neiTimes.isEmpty() || (neiTimes.size() == 1 && !neiTimes.contains(curTime))) {
-                        queue.offer(nei);
-                        neiTimes.add(curTime);
+                List<Integer> times = visitTimes.get(neighbor);
+                if (times.size() < 2 && !times.contains(nextTime)) {
+                    times.add(nextTime);
+                    queue.offer(new int[]{neighbor, nextTime});
+
+                    // If we've reached target twice, return the second time
+                    if (neighbor == n && times.size() == 2) {
+                        return nextTime;
                     }
                 }
             }
-
-            // Handle traffic signals (wait for green light if needed)
-            if ((curTime / change) % 2 == 1) {
-                curTime += change - (curTime % change);
-            }
-
-            // Increase current time by the edge traversal time
-            curTime += time;
         }
 
-        return -1; // Return -1 if the second minimum path is not found
+        return -1;
     }
 }
