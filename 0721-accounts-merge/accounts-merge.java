@@ -3,98 +3,60 @@ class Solution {
     Map<String, String> parent = new HashMap<>();
     Map<String, Integer> size = new HashMap<>();
 
-    private void union(String email1, String email2){
-
+    private void union(String email1, String email2) {
         String p1 = findParent(email1);
         String p2 = findParent(email2);
-        
-        if(p1.equals(p2)) return;
 
-        int size1 = size.get(p1);
-        int size2 = size.get(p2);
+        if (p1.equals(p2)) return;
 
-        if(size1  <  size2) {
+        if (size.get(p1) < size.get(p2)) {
             parent.put(p1, p2);
             size.put(p2, size.get(p2) + size.get(p1));
-        }else{
+        } else {
             parent.put(p2, p1);
-            size.put(p1, size.get(p2) + size.get(p1));
+            size.put(p1, size.get(p1) + size.get(p2));
         }
-        
-
-
-
     }
 
-    private String findParent(String email){
-        if(parent.get(email) != email){
-        
-            String topParent = findParent(parent.get(email));
-            parent.put(email, topParent);
+    private String findParent(String email) {
+        if (!parent.get(email).equals(email)) {
+            parent.put(email, findParent(parent.get(email))); // Path compression
         }
-
         return parent.get(email);
     }
 
+    private void addEmail(String email, String name) {
+        if (!parent.containsKey(email)) {
+            parent.put(email, email);
+            size.put(email, 1);
+            emailToName.put(email, name);
+        }
+    }
 
     public List<List<String>> accountsMerge(List<List<String>> accounts) {
-
-        List<List<String>> ans;
-
-        Map<String, List<String>> ultParent = new HashMap<>();
-        Set<String> emails = new HashSet<>();
-
-
-        for(List<String> account : accounts){
+        for (List<String> account : accounts) {
             String name = account.get(0);
-
-            if(account.size() == 2) {
-                String email = account.get(1);
-                parent.put(email, email);
-                size.put(email, 1);
-                emailToName.put(email, name);
-                emails.add(email);
-                continue;
-            }
-            for(int i =1;i < account.size()-1; ++i){
-                String email1 = account.get(i);
-                String email2 = account.get(i + 1);
-                
-                if(!parent.containsKey(email1)) {
-
-                    parent.put(email1, email1);
-                    size.put(email1, 1);
-                    emailToName.put(email1, name);
-                    emails.add(email1);
-
-                }
-                
-
-                if(!parent.containsKey(email2)) {
-                    parent.put(email2, email2);
-                    size.put(email2, 1);
-                    emailToName.put(email2, name);
-                    emails.add(email2);
-                }
-
-                union(email1, email2);
+            for (int i = 1; i < account.size(); ++i) {
+                addEmail(account.get(i), name);
+                if (i > 1) union(account.get(1), account.get(i));
             }
         }
 
-        for(String s : emails){
-            String tParent = findParent(s);
-            ultParent.putIfAbsent(tParent, new ArrayList<String>());
-            ultParent.get(tParent).add(s);
+        // Group emails by their root parent
+        Map<String, List<String>> groups = new HashMap<>();
+        for (String email : parent.keySet()) {
+            String root = findParent(email);
+            groups.computeIfAbsent(root, k -> new ArrayList<>()).add(email);
         }
 
-        ans = new ArrayList<>(ultParent.values());
-        for(List<String> li: ans){
-            Collections.sort(li);
-            li.add(0, emailToName.get(li.get(0)));
+        // Build the result
+        List<List<String>> result = new ArrayList<>();
+        for (List<String> group : groups.values()) {
+            Collections.sort(group);
+            group.add(0, emailToName.get(group.get(0)));
+            result.add(group);
         }
 
-        return ans;
-
-        
+        return result;
     }
 }
