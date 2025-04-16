@@ -11,7 +11,7 @@ class Solution {
 
         boolean found = false;
 
-        while (!que.isEmpty() && !found) {
+        while (!que.isEmpty()) {
             int size = que.size();
             Set<String> toRemove = new HashSet<>();
 
