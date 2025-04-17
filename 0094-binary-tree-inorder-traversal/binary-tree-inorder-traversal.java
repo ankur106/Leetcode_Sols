@@ -23,14 +23,19 @@ class Solution {
         TreeNode curr = root;
 
         while (curr != null || !stack.isEmpty()) {
+
+            //go as left as possible
             while (curr != null) {
                 stack.push(curr);
                 curr = curr.left;
             }
-
+            
+            //visit
             curr = stack.pop();
             ans.add(curr.val);
+            
 
+            //go right
             curr = curr.right;
         }
         // traverse(root, ans);
