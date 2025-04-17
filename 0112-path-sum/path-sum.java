@@ -15,36 +15,12 @@
  */
 class Solution {
     public boolean hasPathSum(TreeNode root, int targetSum) {
-        
         if(root == null) return false;
 
-        for(int i : getPathSum(root) ){
-            System.out.println(i);
-            if(i==targetSum) return true;
-        }
-
-        return false;
+        if(root.left == null && root.right == null && targetSum == root.val) return true;
         
+
+        return hasPathSum(root.left, targetSum - root.val) || hasPathSum(root.right,targetSum - root.val);
     }
 
-
-    private List<Integer> getPathSum(TreeNode node) {
-        if(node ==null) return new ArrayList<Integer>();
-
-
-        List<Integer> left = getPathSum(node.left);
-        List<Integer> right = getPathSum(node.right);
-
-        if(left.size()==0 && right.size()==0) return List.of(node.val);
-        List<Integer> ans = new ArrayList<>();
-        for(int i : left){
-            ans.add(i + node.val);
-        } 
-        for(int i : right){
-            ans.add(i + node.val);
-        } 
-
-        return ans;
-
-    }
 }
