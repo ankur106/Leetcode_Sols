@@ -1,32 +1,23 @@
-import java.util.HashSet;
-
 class Solution {
-    private HashSet<Character>[] rows = new HashSet[9];
-    private HashSet<Character>[] cols = new HashSet[9];
-    private HashSet<Character>[][] boxes = new HashSet[3][3];
+    private boolean[][] rows = new boolean[9][9];
+    private boolean[][] cols = new boolean[9][9];
+    private boolean[][] boxes = new boolean[9][9];
 
     public void solveSudoku(char[][] board) {
-        for (int i = 0; i < 9; i++) {
-            rows[i] = new HashSet<>();
-            cols[i] = new HashSet<>();
-        }
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                boxes[i][j] = new HashSet<>();
-            }
-        }
-
+        // Initialize state from the current board
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
                 char c = board[i][j];
                 if (c != '.') {
-                    rows[i].add(c);
-                    cols[j].add(c);
-                    boxes[i / 3][j / 3].add(c);
+                    int num = c - '1'; // convert '1'-'9' to 0-8
+                    rows[i][num] = true;
+                    cols[j][num] = true;
+                    boxes[boxIndex(i, j)][num] = true;
                 }
             }
         }
 
+        // Start backtracking
         solve(board, 0, 0);
     }
 
@@ -35,28 +26,23 @@ class Solution {
         if (col == 9) return solve(board, row + 1, 0);
         if (board[row][col] != '.') return solve(board, row, col + 1);
 
-        for (char num = '1'; num <= '9'; num++) {
-            if (isValid(row, col, num)) {
-                board[row][col] = num;
-                rows[row].add(num);
-                cols[col].add(num);
-                boxes[row / 3][col / 3].add(num);
+        for (int d = 0; d < 9; d++) {
+            if (!rows[row][d] && !cols[col][d] && !boxes[boxIndex(row, col)][d]) {
+                board[row][col] = (char)(d + '1');
+                rows[row][d] = cols[col][d] = boxes[boxIndex(row, col)][d] = true;
 
                 if (solve(board, row, col + 1)) return true;
 
+                // Backtrack
                 board[row][col] = '.';
-                rows[row].remove(num);
-                cols[col].remove(num);
-                boxes[row / 3][col / 3].remove(num);
+                rows[row][d] = cols[col][d] = boxes[boxIndex(row, col)][d] = false;
             }
         }
 
         return false;
     }
 
-    private boolean isValid(int row, int col, char num) {
-        return !rows[row].contains(num) &&
-               !cols[col].contains(num) &&
-               !boxes[row / 3][col / 3].contains(num);
+    private int boxIndex(int row, int col) {
+        return (row / 3) * 3 + (col / 3);  // maps (row, col) to a 0-8 box index
     }
 }
