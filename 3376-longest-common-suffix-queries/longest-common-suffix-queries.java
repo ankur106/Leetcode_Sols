@@ -1,103 +1,47 @@
-import java.util.*;
-
 class Solution {
 
     class TrieNode {
-        TrieNode[] childNode = new TrieNode[26];
-        boolean isEnd = false;
-        int index = 0;
+        int index;
+        TrieNode[] child = new TrieNode[26];
+        TrieNode(int index) {
+            this.index = index;
+        }
     }
-
-    class Trie {
-
-        TrieNode root;
-
-        Trie(){
-            root = new TrieNode();
-        }
-
-        public void insert(String s, int index){
-            int len = s.length();
-
-            TrieNode node = root;
-            for(int i = len - 1; i >= 0; --i){
-                if(node.childNode[s.charAt(i) - 'a'] == null)
-                    node.childNode[s.charAt(i) - 'a'] = new TrieNode();
-
-                node = node.childNode[s.charAt(i) - 'a'];
-            } 
-
-            if(node.isEnd) return; 
-            node.isEnd = true;
-            node.index = index;
-        }
-
-        public int findString(String query){
-            int len = query.length();
-
-            TrieNode node = root;
-            // if(node.childNode[query.charAt(len-1) - 'a'] == null ) return 1;
-            for(int i = len - 1; i >= 0; --i){
-                if(node.childNode[query.charAt(i) - 'a'] == null) break;
-                node = node.childNode[query.charAt(i) - 'a'];
+    
+    public int[] stringIndices(String[] words, String[] query) {
+        int n = words.length, k = 0;
+        TrieNode root = new TrieNode(0);
+        for (int i = 0; i < n; i++) {
+            int m = words[i].length();
+            if (m < words[root.index].length()) {
+                root.index = i;
             }
-
-            return findSmallest(node);
-        }
-
-        private int findSmallest(TrieNode node){
-            Queue<TrieNode> que = new LinkedList<>();
-
-            if (node.isEnd) return node.index;
-
-            for(TrieNode n : node.childNode){
-                if(n != null) que.offer(n);
-            }
-
-            while(!que.isEmpty()){
-                int size = que.size();
-                int index = Integer.MAX_VALUE;
-
-                for(int i = 0; i < size; ++i){
-                    TrieNode curr = que.poll();
-
-                    if(curr.isEnd) index = Math.min(index, curr.index);
-                    for(TrieNode n : curr.childNode){
-                        if(n != null) que.offer(n);
-                    }
+            TrieNode node = root;
+            for (int j = m-1; j >= 0; j--) {
+                int c = words[i].charAt(j)-'a';
+                if (node.child[c] == null) {
+                    node.child[c] = new TrieNode(i);
                 }
-
-                if(index != Integer.MAX_VALUE) return index;
+                node = node.child[c];
+                if (m < words[node.index].length()) {
+                    node.index = i;
+                }
             }
-
-            return -1; // fallback
-        }    
-    }
-
-    public int[] stringIndices(String[] wordsContainer, String[] wordsQuery) {
-        Trie trie = new Trie();
-
-        Map<String, Integer> memo = new HashMap<>();
-
-        int index = 0;
-        for(String s : wordsContainer){
-            trie.insert(s, index++);
         }
 
-        int len = wordsQuery.length;
-        int[] ans = new int[len];
-
-        index = 0;
-        for(String s : wordsQuery ){
-            
-            if(!memo.containsKey(s)){
-                memo.put(s, trie.findString(s));
-
+        int[] ans = new int[query.length];
+        for (String q : query) {
+            TrieNode node = root;
+            for (int j = q.length()-1; j >= 0; j--) {
+                int c = q.charAt(j)-'a';
+                if (node.child[c] == null) {
+                    break;
+                }
+                node = node.child[c];
             }
-            ans[index] = memo.get(s);
-        
-            index++;
-        } 
+
+            ans[k++] = node.index;
+        }
 
         return ans;
     }
