@@ -4,27 +4,25 @@ class Solution {
         int len = nums.length;
         int[] nextPossibleEnd = new int[len];
 
+        int[] nextMinK = new int[len];
+        int[] nextMaxK = new int[len];
+
         int possible = -1;
+        int nextMin = len;
+        int nextMax = len;
         for(int i = len -1 ; i >= 0; --i){
             
             if(possible == -1 && nums[i] >= minK && nums[i] <= maxK) possible = i;
             if(nums[i] < minK || nums[i]  > maxK) possible  = -1;
             nextPossibleEnd[i] = possible;
-        }
 
-        int[] nextMinK = new int[len];
-        int[] nextMaxK = new int[len];
-
-        int nextMin = len;
-        int nextMax = len;
-
-        for(int i = len -1 ; i >= 0; --i){
             if(nums[i] == minK)nextMin = i;
             if(nums[i] == maxK)nextMax = i;
 
             nextMinK[i] = nextMin;
             nextMaxK[i] = nextMax;
         }
+
 
         long ans = 0;
 
