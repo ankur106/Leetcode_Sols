@@ -10,7 +10,9 @@ class Solution {
 
             // Check if the current number is outside the desired range
             if (currentNum < minK || currentNum > maxK) {
-                leftBound = i; // This index cannot be part of any valid subarray further on
+                leftBound = i;
+                continue;
+                 // This index cannot be part of any valid subarray further on
                 // minKIndex and maxKIndex before this point are now irrelevant
                 // for subarrays ending at or after i, because those subarrays
                 // must start *after* leftBound.
