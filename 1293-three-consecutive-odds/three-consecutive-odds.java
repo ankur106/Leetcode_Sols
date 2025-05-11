@@ -1,14 +1,15 @@
 class Solution {
     public boolean threeConsecutiveOdds(int[] arr) {
+        
+        int num = 0;
+        
+        for(int i : arr){
+            if(i%2 != 0)num++;
+            else num =0;
 
-        int len = arr.length;
-
-        for(int i=0; i < len -2; ++i){
-            if(arr[i] % 2 !=0 &&  arr[i +1] % 2 !=0 && arr[i+2] % 2 !=0) return true;
-
+            System.out.println(i + " "+ num);
+            if(num==3)return true;
         }
-
-
         return false;
         
     }
