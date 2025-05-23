@@ -1,30 +1,26 @@
-import java.util.*;
-
 class Solution {
     public long maximumValueSum(int[] nums, int k, int[][] edges) {
-        long totalSum = 0;
-        PriorityQueue<Integer> deltaQueue = new PriorityQueue<>();
+        long total = 0;
         for (int num : nums) {
-            int xored = num ^ k;
-            int delta = xored - num;
-            deltaQueue.offer(delta);
-            totalSum += num; 
+            total += num;
         }
 
+        long totalDiff = 0;
+        long diff;
+        int positiveCount = 0;
+        long minAbsDiff = Long.MAX_VALUE;
+        for (int num : nums) {
+            diff = (num ^ k) - num;
 
-        long netChange = 0;
-        List<Integer> deltas = new ArrayList<>(deltaQueue);
-        Collections.sort(deltas, Collections.reverseOrder());
-
-        for (int i = 0; i + 1 < deltas.size(); i += 2) {
-            int pairSum = deltas.get(i) + deltas.get(i + 1);
-            if (pairSum > 0) {
-                netChange += pairSum; 
-            } else {
-                break;
+            if (diff > 0) {
+                totalDiff += diff;
+                positiveCount++;
             }
+            minAbsDiff = Math.min(minAbsDiff, Math.abs(diff));
         }
-
-        return totalSum + netChange;
+        if (positiveCount % 2 == 1) {
+            totalDiff -= minAbsDiff;
+        }
+        return total + totalDiff;
     }
 }
