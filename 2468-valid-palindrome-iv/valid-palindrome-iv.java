@@ -7,12 +7,12 @@ class Solution {
 
         while(low <= high){
             if(s.charAt(low) != s.charAt(high)) change++;
-            if(change > 2 ) break;
+            if(change > 2 ) return false;
             low++;
             high--;
         }
 
-        return change <=2;
+        return true;
         
     }
 }
