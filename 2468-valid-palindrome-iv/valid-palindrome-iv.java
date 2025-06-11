@@ -7,7 +7,7 @@ class Solution {
 
         while(low <= high){
             if(s.charAt(low) != s.charAt(high)) change++;
-
+            if(change > 2 ) break;
             low++;
             high--;
         }
