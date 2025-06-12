@@ -15,30 +15,50 @@
  */
 import java.util.*;
 
-class Solution {
-    public List<List<Integer>> verticalOrder(TreeNode root) {
-        Map<Integer, List<int[]>> columnTable = new TreeMap<>();
-        dfs(root, 0, 0, columnTable);
 
-        List<List<Integer>> result = new ArrayList<>();
-        for (List<int[]> nodes : columnTable.values()) {
-            nodes.sort((a, b) -> a[0] - b[0]);
-            List<Integer> col = new ArrayList<>();
-            for (int[] entry : nodes) {
-                col.add(entry[1]);
-            }
-            result.add(col);
+
+class Solution {
+    class NodeInfo {
+        TreeNode node;
+        int col;
+        NodeInfo(TreeNode node, int col) {
+            this.node = node;
+            this.col = col;
         }
-        return result;
     }
 
-    private void dfs(TreeNode node, int row, int col, Map<Integer, List<int[]>> table) {
-        if (node == null) return;
+    public List<List<Integer>> verticalOrder(TreeNode root) {
+        if (root == null) return new ArrayList<>();
 
-        table.putIfAbsent(col, new ArrayList<>());
-        table.get(col).add(new int[]{row, node.val});
+        Map<Integer, List<Integer>> columnTable = new HashMap<>();
+        Queue<NodeInfo> queue = new LinkedList<>();
 
-        dfs(node.left, row + 1, col - 1, table);
-        dfs(node.right, row + 1, col + 1, table);
+        int minCol = 0, maxCol = 0;
+
+        queue.offer(new NodeInfo(root, 0));
+
+        while (!queue.isEmpty()) {
+            NodeInfo info = queue.poll();
+            TreeNode node = info.node;
+            int col = info.col;
+
+            columnTable.putIfAbsent(col, new ArrayList<>());
+            columnTable.get(col).add(node.val);
+
+            minCol = Math.min(minCol, col);
+            maxCol = Math.max(maxCol, col);
+
+            if (node.left != null)
+                queue.offer(new NodeInfo(node.left, col - 1));
+            if (node.right != null)
+                queue.offer(new NodeInfo(node.right, col + 1));
+        }
+
+        List<List<Integer>> result = new ArrayList<>();
+        for (int i = minCol; i <= maxCol; i++) {
+            result.add(columnTable.get(i));
+        }
+
+        return result;
     }
 }
