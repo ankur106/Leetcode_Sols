@@ -16,7 +16,7 @@ class Solution {
         for (int i = 0; i < nums.length; i++) {
             if (visited[i]) continue;
 
-            if (i > 0 && nums[i] == nums[i - 1] && !visited[i - 1]) continue; // skip duplicates
+            if (i > 0 && nums[i] == nums[i - 1] && !visited[i - 1]) continue;
 
             visited[i] = true;
             temp.add(nums[i]);
