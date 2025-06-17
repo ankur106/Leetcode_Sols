@@ -10,7 +10,7 @@ class Solution {
 
         // minHeap: [cost, currentNode, stopsUsed]
         Queue<int[]> pq = new PriorityQueue<>((a, b) -> Integer.compare(a[0], b[0]));
-        pq.offer(new int[]{0, src, 0});
+        pq.offer(new int[]{0, src, -1});
 
         // visited map to avoid reprocessing worse costs with same or more stops
         Map<Integer, Integer> visited = new HashMap<>();
@@ -22,7 +22,7 @@ class Solution {
             int stops = curr[2];
 
             if (node == dst) return cost;
-            if (stops > k) continue;
+            if (stops == k) continue;
 
             if (visited.containsKey(node) && visited.get(node) <= stops) {
                 continue;
