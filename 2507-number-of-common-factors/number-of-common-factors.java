@@ -3,12 +3,10 @@ class Solution {
         int g = gcd(a, b);
         int count = 0;
 
-        for (int i = 1; i * i <= g; ++i) {
-            if (g % i == 0) {
-                count++; 
-                if (i != g / i) count++; 
-            }
+        for (int i = 1; i <= g / 2; ++i) {
+            if (g % i == 0) count++;
         }
+        count++;
 
         return count;
     }
