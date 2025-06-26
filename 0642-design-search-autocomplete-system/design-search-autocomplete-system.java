@@ -1,72 +1,78 @@
 class TrieNode {
-    Map<Character, TrieNode> children = new HashMap<>();
-    boolean isEnd = false;
+    Map<Character, TrieNode> children;
+    Map<String, Integer> sentences;
+    public TrieNode() {
+        children = new HashMap<>();
+        sentences = new HashMap<>();
+    }
 }
 
 class AutocompleteSystem {
-    private TrieNode root;
-    private TrieNode currNode;
-    private StringBuilder currSentence;
-    private Map<String, Integer> freqMap;
-
+    TrieNode root;
+    TrieNode currNode;
+    TrieNode dead;
+    StringBuilder currSentence;
+    
     public AutocompleteSystem(String[] sentences, int[] times) {
         root = new TrieNode();
-        freqMap = new HashMap<>();
         for (int i = 0; i < sentences.length; i++) {
-            addToTrie(sentences[i]);
-            freqMap.put(sentences[i], freqMap.getOrDefault(sentences[i], 0) + times[i]);
+            addToTrie(sentences[i], times[i]);
         }
+        
         currSentence = new StringBuilder();
         currNode = root;
+        dead = new TrieNode();
     }
-
+    
     public List<String> input(char c) {
         if (c == '#') {
-            String sentence = currSentence.toString();
-            addToTrie(sentence);
-            freqMap.put(sentence, freqMap.getOrDefault(sentence, 0) + 1);
+            addToTrie(currSentence.toString(), 1);
             currSentence.setLength(0);
             currNode = root;
-            return new ArrayList<>();
+            return new ArrayList<String>();
         }
-
+        
         currSentence.append(c);
-        if (currNode == null || !currNode.children.containsKey(c)) {
-            currNode = null;
-            return new ArrayList<>();
+        if (!currNode.children.containsKey(c)) {
+            currNode = dead;
+            return new ArrayList<String>();
         }
-
+        
         currNode = currNode.children.get(c);
-        List<String> candidates = new ArrayList<>();
-        dfs(currNode, currSentence.toString(), candidates);
-
-        Collections.sort(candidates, (a, b) -> {
-            int freqA = freqMap.get(a);
-            int freqB = freqMap.get(b);
-            if (freqA == freqB) {
+        List<String> sentences = new ArrayList<>(currNode.sentences.keySet());
+        Collections.sort(sentences, (a, b) -> {
+            int hotA = currNode.sentences.get(a);
+            int hotB = currNode.sentences.get(b);
+            if (hotA == hotB) {
                 return a.compareTo(b);
             }
-            return freqB - freqA;
+            
+            return hotB - hotA;
         });
-
-        return candidates.size() > 3 ? candidates.subList(0, 3) : candidates;
+        
+        List<String> ans = new ArrayList<>();
+        for (int i = 0; i < Math.min(3, sentences.size()); i++) {
+            ans.add(sentences.get(i));
+        }
+        
+        return ans;
     }
-
-    private void addToTrie(String sentence) {
+    
+    private void addToTrie(String sentence, int count) {
         TrieNode node = root;
-        for (char c : sentence.toCharArray()) {
-            node.children.putIfAbsent(c, new TrieNode());
+        for (char c: sentence.toCharArray()) {
+            if (!node.children.containsKey(c)) {
+                node.children.put(c, new TrieNode());
+            }
+            
             node = node.children.get(c);
-        }
-        node.isEnd = true;
-    }
-
-    private void dfs(TrieNode node, String path, List<String> result) {
-        if (node.isEnd) {
-            result.add(path);
-        }
-        for (Map.Entry<Character, TrieNode> entry : node.children.entrySet()) {
-            dfs(entry.getValue(), path + entry.getKey(), result);
+            node.sentences.put(sentence, node.sentences.getOrDefault(sentence, 0) + count);
         }
     }
 }
+
+/**
+ * Your AutocompleteSystem object will be instantiated and called as such:
+ * AutocompleteSystem obj = new AutocompleteSystem(sentences, times);
+ * List<String> param_1 = obj.input(c);
+ */
