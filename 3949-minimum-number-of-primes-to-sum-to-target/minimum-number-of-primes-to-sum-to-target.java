@@ -11,9 +11,13 @@ class Solution {
         Arrays.fill(dp, INF);
         dp[0] = 0;
 
-        fill(dp, primes, 1, n);
+        for (int p : primes) {
+            for (int sum = p; sum <= n; sum++) {
+                dp[sum] = Math.min(dp[sum], dp[sum - p] + 1);
+            }
+        }
 
-        return dp[n] <= n ? dp[n] : -1;
+        return dp[n] > n ? -1 : dp[n];
     }
 
     private List<Integer> getFirstMPrimes(int m) {
@@ -34,14 +38,5 @@ class Solution {
             if (x % i == 0) return false;
         }
         return true;
-    }
-
-    private void fill(int[] dp, List<Integer> primes, int sum, int n) {
-        if (sum > n) return;
-        for (int p : primes) {
-            if (p > sum) break;
-            dp[sum] = Math.min(dp[sum], dp[sum - p] + 1);
-        }
-        fill(dp, primes, sum + 1, n);
     }
 }
