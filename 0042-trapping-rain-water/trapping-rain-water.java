@@ -20,6 +20,7 @@ public class Solution {
                 --right;
             }
         }
+        System.gc();
         return ans;
     }
 }
