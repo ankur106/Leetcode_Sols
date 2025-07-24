@@ -8,6 +8,7 @@ class Solution {
             cars[i][1] = speed[i];
         }
         
+        //sort based on position
         Arrays.sort(cars, (a, b) -> Integer.compare(b[0], a[0]));
         
         Stack<Double> stack = new Stack<>();
