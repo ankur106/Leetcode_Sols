@@ -4,11 +4,11 @@ class Solution {
         int m = grid[0].length;
 
         for (int col = 1; col < m; col++) {
-            sortDSC(grid, 0, col);
+            sortASC(grid, 0, col);
         }
 
         for (int row = 0; row < n; row++) {
-            sortASC(grid, row, 0);
+            sortDSC(grid, row, 0);
         }
 
         return grid;
@@ -18,7 +18,7 @@ class Solution {
         int n = mat.length;
         int m = mat[0].length;
         for (int i = row, j = col; i < n && j < m; i++, j++) {
-            for (int k = row, l = col; k < n && l < m; k++, l++) {
+            for (int k = i, l = j; k < n && l < m; k++, l++) {
                 if (mat[k][l] < mat[i][j]) {
                     swap(mat, i, j, k, l);
                 }
@@ -30,7 +30,7 @@ class Solution {
         int n = mat.length;
         int m = mat[0].length;
         for (int i = row, j = col; i < n && j < m; i++, j++) {
-            for (int k = row, l = col; k < n && l < m; k++, l++) {
+            for (int k = i, l = j; k < n && l < m; k++, l++) {
                 if (mat[k][l] > mat[i][j]) {
                     swap(mat, i, j, k, l);
                 }
