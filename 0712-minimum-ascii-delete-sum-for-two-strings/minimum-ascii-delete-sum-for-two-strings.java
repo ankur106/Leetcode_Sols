@@ -16,7 +16,6 @@ class Solution {
         return sum;
     }
 
-    // "Weighted LCS": maximum possible ASCII sum of a common subsequence
     private int maxCommonAsciiSum(String s1, String s2, int i, int j, int[][] memo) {
         if (i == s1.length() || j == s2.length()) return 0;
 
