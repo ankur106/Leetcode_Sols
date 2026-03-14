@@ -1,32 +1,40 @@
 class Solution {
     public int myAtoi(String s) {
         s = s.trim();
-        int len = s.length();
-        if (len == 0) return 0;
+        if (s.length() == 0) return 0;
 
         int sign = 1;
-        int i = 0;
+        int index = 0;
 
-        if (s.charAt(i) == '-') {
+        if (s.charAt(0) == '-') {
             sign = -1;
-            i++;
-        } else if (s.charAt(i) == '+') {
-            i++;
+            index++;
+        } else if (s.charAt(0) == '+') {
+            index++;
         }
 
-        int number = 0;
-        while (i < len && Character.isDigit(s.charAt(i))) {
-            int digit = s.charAt(i) - '0';
+        long ans = rec(s, index, 0L);
 
-            // Check for overflow
-            if (number > (Integer.MAX_VALUE - digit) / 10) {
-                return sign == 1 ? Integer.MAX_VALUE : Integer.MIN_VALUE;
-            }
+        ans = ans * sign;
 
-            number = number * 10 + digit;
-            i++;
+        if (ans > Integer.MAX_VALUE) return Integer.MAX_VALUE;
+        if (ans < Integer.MIN_VALUE) return Integer.MIN_VALUE;
+
+        return (int) ans;
+    }
+
+    private long rec(String s, int index, long num) {
+        if (index >= s.length() || !Character.isDigit(s.charAt(index))) {
+            return num;
         }
 
-        return number * sign;
+        num = num * 10 + (s.charAt(index) - '0');
+
+        // clamp early to avoid overflow in recursion
+        if (num > (long) Integer.MAX_VALUE + 1) {
+            return num;
+        }
+
+        return rec(s, index + 1, num);
     }
 }
