@@ -1,42 +1,17 @@
 class Solution {
-    
-   public static int[] secondGreaterElement(int[] nums) {
-        int n = nums.length;
-        int[] res = new int[n];
+        public int[] secondGreaterElement(int[] A) {
+        int n = A.length,  res[] = new int[n];
         Arrays.fill(res, -1);
-        Stack<Integer> st = new Stack<>();
-        List<List<Integer>> arr = new ArrayList<>();
-
-        for (int i = 0; i < n; i++) {
-            arr.add(new ArrayList<>());
+        Stack<Integer> s1 = new Stack<>(), s2 = new Stack<>(), tmp = new Stack<>();
+        for (int i=0; i < n; i++) {
+            while (!s2.empty() && A[s2.peek()] < A[i])
+                res[s2.pop()] = A[i];
+            while (!s1.empty() && A[s1.peek()] < A[i])
+                tmp.push(s1.pop());
+            while (!tmp.empty())
+                s2.push(tmp.pop());
+            s1.push(i);
         }
-
-        for (int i = n - 1; i >= 0; i--) {
-            while (!st.isEmpty() && nums[i] >= nums[st.peek()]) {
-                st.pop();
-            }
-            if (!st.isEmpty()) {
-                int ind = st.peek();
-                arr.get(ind).add(i);
-            }
-            st.push(i);
-        }
-
-        st.clear();
-
-        for (int i = n - 1; i >= 0; i--) {
-            for (int ind : arr.get(i)) {
-                while (!st.isEmpty() && nums[ind] >= st.peek()) {
-                    st.pop();
-                }
-                if (!st.isEmpty()) {
-                    res[ind] = st.peek();
-                }
-            }
-            st.push(nums[i]);
-        }
-
         return res;
     }
-    
 }
