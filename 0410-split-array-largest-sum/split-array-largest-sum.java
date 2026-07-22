@@ -1,39 +1,35 @@
 class Solution {
     public int splitArray(int[] nums, int k) {
-
-        int high = 0, low = 0;
-        
-        //maximum largest sum is sum of all num in nums
-        for(int num : nums){
-            high += num;
+        int low = 0;      // largest single element — cap can't be smaller
+        long high = 0;    // sum of all elements — cap never needs to be larger
+        for (int num : nums) {
             low = Math.max(low, num);
+            high += num;
         }
 
-        while(low < high){
-            int mid = low + (high - low)/2;
-
-            if(subarrayWithSum(nums, mid) <= k){
-                high = mid;
-            }else{
-                low = mid + 1;
+        long lo = low, hi = high;
+        while (lo < hi) {
+            long mid = lo + (hi - lo) / 2;
+            if (minPartitions(nums, mid) <= k) {
+                hi = mid;          // cap works → try a tighter cap
+            } else {
+                lo = mid + 1;      // too many pieces → need a bigger cap
             }
         }
-
-        return low;
+        return (int) lo;
     }
 
-    private int subarrayWithSum(int[] nums, int sum){
-        int k = 0;
-        int currSum = 0;
-        for(int num : nums){
-            currSum += num;
-
-            if(currSum > sum){
+    private int minPartitions(int[] nums, long cap) {
+        int pieces = 1;
+        long currSum = 0;
+        for (int num : nums) {
+            if (currSum + num > cap) {
+                pieces++;
                 currSum = num;
-                k++;
+            } else {
+                currSum += num;
             }
         }
-        if(currSum > 0)k++;
-        return k;
+        return pieces;
     }
 }
