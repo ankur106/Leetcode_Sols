@@ -1,27 +1,33 @@
-import java.util.*;
-
 class Solution {
+    int[] nums;
+    List<List<Integer>> subsets;
+    int len;
+
     public List<List<Integer>> subsetsWithDup(int[] nums) {
         Arrays.sort(nums);
-        List<List<Integer>> ans = new ArrayList<>();
-        helper(0, nums, new ArrayList<>(), ans);
-        return ans;
+        this.nums = nums;
+        this.len = nums.length;
+        this.subsets = new ArrayList<>();
+
+        findSubSets(0, new ArrayList<Integer>());
+        return subsets;
     }
 
-    private void helper(int ind, int[] nums, List<Integer> curr, List<List<Integer>> ans) {
-        if (ind == nums.length) {
-            ans.add(new ArrayList<>(curr));
+    private void findSubSets(int index, List<Integer> currSubSet){
+        if(index == this.len){
+            this.subsets.add(new ArrayList<>(currSubSet));
             return;
         }
 
-        curr.add(nums[ind]);
-        helper(ind + 1, nums, curr, ans);
-        curr.remove(curr.size() - 1);
+        currSubSet.add(this.nums[index]);
+        findSubSets(index + 1, currSubSet);
+        currSubSet.remove(currSubSet.size() - 1);
 
-        int next = ind + 1;
-        while (next < nums.length && nums[next] == nums[ind]) {
-            next++;
+        int currEle = this.nums[index];
+        while(index != this.len && this.nums[index] == currEle){
+            index++;
         }
-        helper(next, nums, curr, ans);
+        findSubSets(index, currSubSet);
+
     }
 }
