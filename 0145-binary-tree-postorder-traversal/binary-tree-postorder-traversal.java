@@ -17,7 +17,6 @@ import java.util.*;
 
 class Solution {
     public List<Integer> postorderTraversal(TreeNode root) {
-        List<Integer> it = new ArrayList<>();
 
         List<Integer> ans = new ArrayList<>();
         traverse(root, ans);
