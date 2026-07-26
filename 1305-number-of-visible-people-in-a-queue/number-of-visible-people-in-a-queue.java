@@ -1,27 +1,23 @@
 class Solution {
     public int[] canSeePersonsCount(int[] heights) {
-
         int len = heights.length;
 
-        int[] canView = new int[len];
+        int[] visibleFromIndex = new int[len];
+        Deque<int[]> stk = new ArrayDeque<>(); //0-> height, 1 -> index;
 
-        Deque<Integer> st = new ArrayDeque<>();
-
-        st.push(len -1);
-
-        for(int i = len -2 ; i >=0; i--){
+        for(int i = len - 1; i >= 0; --i){
             int count = 0;
-            while(!st.isEmpty() && heights[st.peek()] <= heights[i]){
-                st.pop();
-                count++;
+            while(!stk.isEmpty() && stk.peek()[0] < heights[i]){
+                visibleFromIndex[i]++;
+                stk.pop();
             }
 
-        
-            canView[i] = count + (st.isEmpty() ? 0 : 1);
-            st.push(i);
+            if(stk.size() != 0){
+                ++visibleFromIndex[i];
+            }
+
+            stk.push(new int[]{heights[i],i});
         }
-        
-        return canView;
-        
+        return visibleFromIndex;
     }
 }
