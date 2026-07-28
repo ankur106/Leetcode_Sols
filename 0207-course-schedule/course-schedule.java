@@ -1,48 +1,53 @@
 class Solution {
     public boolean canFinish(int numCourses, int[][] prerequisites) {
+        List<List<Integer>> adjLi = new ArrayList<>();
 
-        ArrayList<ArrayList<Integer>> adj = new ArrayList<>();
-
-
-        for(int i=0; i< numCourses; ++i){
-            adj.add(new ArrayList<>());
+        // One adjacency list for every course
+        for (int i = 0; i < numCourses; ++i) {
+            adjLi.add(new ArrayList<>());
         }
 
-
-        for(int[] pre : prerequisites){
-            adj.get(pre[1]).add(pre[0]);
+        // prerequisite[1] must be completed before prerequisite[0]
+        for (int[] prerequisite : prerequisites) {
+            adjLi.get(prerequisite[1]).add(prerequisite[0]);
         }
 
-        int indegree[] = new int[numCourses];
+        // 0 = unvisited, 1 = currently visiting, 2 = completely visited
+        int[] state = new int[numCourses];
 
-        for(ArrayList<Integer> li : adj){
-
-            for(int i : li){
-                indegree[i]++;
+        for (int course = 0; course < numCourses; ++course) {
+            if (state[course] == 0 && hasCycle(adjLi, state, course)) {
+                return false;
             }
         }
 
-        Queue<Integer> que = new LinkedList<>();
+        return true;
+    }
 
-        for(int i=0 ; i < numCourses; ++i){
-            if(indegree[i]==0) que.add(i);
+    private boolean hasCycle(
+        List<List<Integer>> adjLi,
+        int[] state,
+        int course
+    ) {
+        // This node is already in the current DFS path
+        if (state[course] == 1) {
+            return true;
         }
 
-        List<Integer> orderedList = new ArrayList<>();
-        
-        while(que.size() != 0){
+        // This node was already safely processed
+        if (state[course] == 2) {
+            return false;
+        }
 
-            int tmp = que.poll();
-            orderedList.add(tmp);
-            for(int i : adj.get(tmp)){
-                indegree[i]--;
-                if(indegree[i] == 0) que.offer(i);
+        state[course] = 1;
 
+        for (int child : adjLi.get(course)) {
+            if (hasCycle(adjLi, state, child)) {
+                return true;
             }
-
         }
 
-        return orderedList.size() == numCourses;
-        
+        state[course] = 2;
+        return false;
     }
 }
