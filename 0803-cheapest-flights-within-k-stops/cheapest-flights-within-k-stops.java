@@ -1,40 +1,67 @@
-
-
 class Solution {
     public int findCheapestPrice(int n, int[][] flights, int src, int dst, int k) {
-        Map<Integer, List<int[]>> adjList = new HashMap<>();
+        List<List<int[]>> adjList = new ArrayList<>();
 
-        for (int[] flight : flights) {
-            adjList.computeIfAbsent(flight[0], x -> new ArrayList<>()).add(new int[]{flight[1], flight[2]});
+        // Use n, not flights.length
+        for (int i = 0; i < n; ++i) {
+            adjList.add(new ArrayList<>());
         }
 
-        // minHeap: [cost, currentNode, stopsUsed]
-        Queue<int[]> pq = new PriorityQueue<>((a, b) -> Integer.compare(a[0], b[0]));
-        pq.offer(new int[]{0, src, -1});
+        for (int[] flight : flights) {
+            int from = flight[0];
+            int to = flight[1];
+            int price = flight[2];
 
-        // visited map to avoid reprocessing worse costs with same or more stops
-        Map<Integer, Integer> visited = new HashMap<>();
+            adjList.get(from).add(new int[]{to, price});
+        }
 
-        while (!pq.isEmpty()) {
-            int[] curr = pq.poll();
-            int cost = curr[0];
-            int node = curr[1];
-            int stops = curr[2];
+        int[] steps = new int[n];
+        Arrays.fill(steps, Integer.MAX_VALUE);
 
-            if (node == dst) return cost;
-            if (stops == k) continue;
+        PriorityQueue<int[]> minHeap =
+                new PriorityQueue<>((a, b) -> Integer.compare(a[1], b[1]));
 
-            if (visited.containsKey(node) && visited.get(node) <= stops) {
+        // node, price, flights used
+        minHeap.offer(new int[]{src, 0, 0});
+
+        while (!minHeap.isEmpty()) {
+            int[] curr = minHeap.poll();
+
+            int currNode = curr[0];
+            int currPrice = curr[1];
+            int currSteps = curr[2];
+
+            // k stops means at most k + 1 flights
+            if (currSteps > k + 1) {
                 continue;
             }
-            visited.put(node, stops);
 
-            if (adjList.containsKey(node)) {
-                for (int[] neighbor : adjList.get(node)) {
-                    int nextNode = neighbor[0];
-                    int price = neighbor[1];
-                    pq.offer(new int[]{cost + price, nextNode, stops + 1});
-                }
+            // Since heap is ordered by price, first valid dst is cheapest
+            if (currNode == dst) {
+                return currPrice;
+            }
+
+            // We already reached this node using fewer flights
+            if (currSteps >= steps[currNode]) {
+                continue;
+            }
+
+            steps[currNode] = currSteps;
+
+            // Cannot take another flight
+            if (currSteps == k + 1) {
+                continue;
+            }
+
+            for (int[] ngb : adjList.get(currNode)) {
+                int ngbNode = ngb[0];
+                int ngbPrice = ngb[1];
+
+                minHeap.offer(new int[]{
+                        ngbNode,
+                        currPrice + ngbPrice,
+                        currSteps + 1
+                });
             }
         }
 
